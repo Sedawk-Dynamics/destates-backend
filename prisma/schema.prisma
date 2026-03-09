@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  phone     String?
+  role      Role       @default(USER)
+  cartItems CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Property {
+  id             String         @id @default(cuid())
+  name           String
+  location       String
+  city           String
+  price          Float
+  expectedROI    Float
+  monthlyYield   Float?
+  area           Int
+  units          Int
+  availableUnits Int
+  status         PropertyStatus @default(AVAILABLE)
+  description    String
+  highlights     String[]
+  images         String[]
+  reraRegistered Boolean        @default(true)
+  readyToMove    Boolean        @default(false)
+  type           String         @default("Residential")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  LIMITED
+  SOLD_OUT
+}
+
+model LandPlot {
+  id           String   @id @default(cuid())
+  name         String
+  location     String
+  city         String
+  totalArea    Int
+  pricePerSqft Float
+  minArea      Int      @default(100)
+  amenities    String[]
+  description  String
+  images       String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PGListing {
+  id           String   @id @default(cuid())
+  name         String
+  location     String
+  city         String
+  monthlyRent  Float
+  roomType     String
+  amenities    String[]
+  contactPhone String
+  description  String
+  images       String[]
+  available    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CartItem {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType     ItemType
+  itemId       String
+  quantity     Int      @default(1)
+  selectedArea Int?
+  createdAt    DateTime @default(now())
+}
+
+enum ItemType {
+  PROPERTY
+  PLOT
+}
+
+model ContactInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Testimonial {
+  id          String  @id @default(cuid())
+  name        String
+  designation String
+  company     String
+  content     String
+  rating      Int     @default(5)
+  avatarUrl   String?
+}
