@@ -28,15 +28,20 @@ router.get("/users", getUsers);
 router.get("/inquiries", getInquiries);
 
 // Properties CRUD
+const positiveNumber = (field: string, msg: string) =>
+  body(field).custom((v) => { if (typeof v !== "number" || v <= 0) throw new Error(msg); return true; });
+const nonNegativeInt = (field: string, msg: string) =>
+  body(field).custom((v) => { if (typeof v !== "number" || v < 0 || !Number.isInteger(v)) throw new Error(msg); return true; });
+
 const propertyValidation = [
   body("name").trim().notEmpty().withMessage("Name is required"),
   body("location").trim().notEmpty().withMessage("Location is required"),
   body("city").trim().notEmpty().withMessage("City is required"),
-  body("price").isFloat({ gt: 0 }).withMessage("Price must be positive"),
-  body("expectedROI").isFloat({ gt: 0 }).withMessage("Expected ROI is required"),
-  body("area").isInt({ gt: 0 }).withMessage("Area must be positive"),
-  body("units").isInt({ gt: 0 }).withMessage("Units must be positive"),
-  body("availableUnits").isInt({ min: 0 }).withMessage("Available units required"),
+  positiveNumber("price", "Price must be positive"),
+  positiveNumber("expectedROI", "Expected ROI is required"),
+  body("area").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) throw new Error("Area must be positive"); return true; }),
+  body("units").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) throw new Error("Units must be positive"); return true; }),
+  nonNegativeInt("availableUnits", "Available units required"),
   body("description").trim().notEmpty().withMessage("Description is required"),
 ];
 
@@ -49,9 +54,9 @@ const plotValidation = [
   body("name").trim().notEmpty().withMessage("Name is required"),
   body("location").trim().notEmpty().withMessage("Location is required"),
   body("city").trim().notEmpty().withMessage("City is required"),
-  body("totalArea").isInt({ gt: 0 }).withMessage("Total area must be positive"),
-  body("pricePerSqft").isFloat({ gt: 0 }).withMessage("Price per sqft is required"),
-  body("minArea").isInt({ gt: 0 }).withMessage("Min area must be positive"),
+  body("totalArea").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) throw new Error("Total area must be positive"); return true; }),
+  positiveNumber("pricePerSqft", "Price per sqft is required"),
+  body("minArea").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) throw new Error("Min area must be positive"); return true; }),
   body("description").trim().notEmpty().withMessage("Description is required"),
 ];
 
@@ -64,7 +69,7 @@ const pgValidation = [
   body("name").trim().notEmpty().withMessage("Name is required"),
   body("location").trim().notEmpty().withMessage("Location is required"),
   body("city").trim().notEmpty().withMessage("City is required"),
-  body("monthlyRent").isFloat({ gt: 0 }).withMessage("Monthly rent must be positive"),
+  positiveNumber("monthlyRent", "Monthly rent must be positive"),
   body("roomType").trim().notEmpty().withMessage("Room type is required"),
   body("contactPhone").trim().notEmpty().withMessage("Contact phone is required"),
   body("description").trim().notEmpty().withMessage("Description is required"),
@@ -80,7 +85,7 @@ const testimonialValidation = [
   body("designation").trim().notEmpty().withMessage("Designation is required"),
   body("company").trim().notEmpty().withMessage("Company is required"),
   body("content").trim().notEmpty().withMessage("Content is required"),
-  body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be 1-5"),
+  body("rating").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v < 1 || v > 5) throw new Error("Rating must be 1-5"); return true; }),
 ];
 
 router.get("/testimonials", getTestimonials);

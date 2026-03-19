@@ -30,13 +30,15 @@ const router = Router();
 
 router.use(authMiddleware, adminMiddleware);
 
+const getBaseUrl = (req: Request) => `${req.protocol}://${req.get("host")}`;
+
 // Upload single image
 router.post("/image", upload.single("image"), (req: Request, res: Response): void => {
   if (!req.file) {
     res.status(400).json({ success: false, message: "No image file provided" });
     return;
   }
-  const url = `/uploads/${req.file.filename}`;
+  const url = `${getBaseUrl(req)}/uploads/${req.file.filename}`;
   res.json({ success: true, data: { url, filename: req.file.filename } });
 });
 
@@ -47,7 +49,8 @@ router.post("/images", upload.array("images", 10), (req: Request, res: Response)
     res.status(400).json({ success: false, message: "No image files provided" });
     return;
   }
-  const urls = files.map((f) => `/uploads/${f.filename}`);
+  const base = getBaseUrl(req);
+  const urls = files.map((f) => `${base}/uploads/${f.filename}`);
   res.json({ success: true, data: { urls } });
 });
 
