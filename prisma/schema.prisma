@@ -41,8 +41,16 @@ model Property {
   reraRegistered Boolean        @default(true)
   readyToMove    Boolean        @default(false)
   type           String         @default("Residential")
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+
+  // ROI Calculator settings (admin-controlled)
+  roiCalculatorEnabled Boolean @default(true)
+  minInvestment        Float   @default(100000)
+  maxInvestment        Float?
+  investmentStep       Float   @default(100000)
+  projectionYears      Int     @default(5)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum PropertyStatus {
