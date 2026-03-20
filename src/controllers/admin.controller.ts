@@ -55,8 +55,9 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<v
 
 export const updateProperty = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const property = await prisma.property.update({
-      where: { id: req.params.id },
+      where: { id },
       data: req.body,
     });
     res.json({ success: true, data: property });
@@ -67,7 +68,8 @@ export const updateProperty = async (req: AuthRequest, res: Response): Promise<v
 
 export const deleteProperty = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await prisma.property.delete({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    await prisma.property.delete({ where: { id } });
     res.json({ success: true, message: "Property deleted" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to delete property" });
@@ -86,8 +88,9 @@ export const createPlot = async (req: AuthRequest, res: Response): Promise<void>
 
 export const updatePlot = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const plot = await prisma.landPlot.update({
-      where: { id: req.params.id },
+      where: { id },
       data: req.body,
     });
     res.json({ success: true, data: plot });
@@ -98,7 +101,8 @@ export const updatePlot = async (req: AuthRequest, res: Response): Promise<void>
 
 export const deletePlot = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await prisma.landPlot.delete({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    await prisma.landPlot.delete({ where: { id } });
     res.json({ success: true, message: "Plot deleted" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to delete plot" });
@@ -117,8 +121,9 @@ export const createPG = async (req: AuthRequest, res: Response): Promise<void> =
 
 export const updatePG = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const pg = await prisma.pGListing.update({
-      where: { id: req.params.id },
+      where: { id },
       data: req.body,
     });
     res.json({ success: true, data: pg });
@@ -129,7 +134,8 @@ export const updatePG = async (req: AuthRequest, res: Response): Promise<void> =
 
 export const deletePG = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await prisma.pGListing.delete({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    await prisma.pGListing.delete({ where: { id } });
     res.json({ success: true, message: "PG listing deleted" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to delete PG listing" });
@@ -157,8 +163,9 @@ export const createTestimonial = async (req: AuthRequest, res: Response): Promis
 
 export const updateTestimonial = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const testimonial = await prisma.testimonial.update({
-      where: { id: req.params.id },
+      where: { id },
       data: req.body,
     });
     res.json({ success: true, data: testimonial });
@@ -169,7 +176,8 @@ export const updateTestimonial = async (req: AuthRequest, res: Response): Promis
 
 export const deleteTestimonial = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await prisma.testimonial.delete({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    await prisma.testimonial.delete({ where: { id } });
     res.json({ success: true, message: "Testimonial deleted" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to delete testimonial" });

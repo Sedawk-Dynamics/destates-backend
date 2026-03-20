@@ -17,12 +17,17 @@ import uploadRoutes from "./routes/upload.routes";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === "production";
+
+// Validate required env vars
+if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET environment variable is required");
+if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL environment variable is required");
 
 // Middleware
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", credentials: true }));
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
-app.use(morgan("dev"));
-app.use(express.json());
+app.use(morgan(isProduction ? "combined" : "dev"));
+app.use(express.json({ limit: "10mb" }));
 
 // Serve uploaded files
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
