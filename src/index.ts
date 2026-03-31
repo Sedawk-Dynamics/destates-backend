@@ -24,10 +24,7 @@ if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET environment variable is
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL environment variable is required");
 
 // Middleware
-const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
-  .split(",")
-  .map((o) => o.trim());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors({ origin: "*" }));
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(morgan(isProduction ? "combined" : "dev"));
 app.use(express.json({ limit: "10mb" }));
