@@ -9,6 +9,15 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  // Safety: prevent accidental data wipe in production
+  if (process.env.NODE_ENV === "production") {
+    console.error("ERROR: Seed script should not be run in production. It deletes all data.");
+    console.error("If you really need to seed production, set FORCE_SEED=true");
+    if (process.env.FORCE_SEED !== "true") {
+      process.exit(1);
+    }
+  }
+
   // Clean existing data
   await prisma.cartItem.deleteMany();
   await prisma.contactInquiry.deleteMany();
