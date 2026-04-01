@@ -8,4 +8,4 @@ cmds = ["npm ci"]
 cmds = ["npm run build"]
 
 [start]
-cmd = "npx prisma migrate deploy --config prisma/prisma.config.ts && node dist/index.js"
+cmd = "npx prisma migrate deploy --config prisma/prisma.config.ts && node dist/prisma/seed.js && node dist/index.js"

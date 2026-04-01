@@ -9,25 +9,36 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Safety: prevent accidental data wipe in production
-  if (process.env.NODE_ENV === "production") {
-    console.error("ERROR: Seed script should not be run in production. It deletes all data.");
-    console.error("If you really need to seed production, set FORCE_SEED=true");
-    if (process.env.FORCE_SEED !== "true") {
-      process.exit(1);
+  // In production: only seed if database is empty (first deploy).
+  // Use FORCE_SEED=true to wipe and re-seed even if data exists.
+  if (process.env.NODE_ENV === "production" && process.env.FORCE_SEED !== "true") {
+    const userCount = await prisma.user.count();
+    if (userCount > 0) {
+      console.log("Database already has data — skipping seed.");
+      return;
     }
+    console.log("Empty database detected — seeding initial data...");
+  } else if (process.env.FORCE_SEED === "true") {
+    console.log("FORCE_SEED enabled — wiping and re-seeding...");
+    await prisma.cartItem.deleteMany();
+    await prisma.contactInquiry.deleteMany();
+    await prisma.testimonial.deleteMany();
+    await prisma.property.deleteMany();
+    await prisma.landPlot.deleteMany();
+    await prisma.pGListing.deleteMany();
+    await prisma.user.deleteMany();
+    console.log("Cleared existing data.");
+  } else {
+    // Development: always wipe and re-seed
+    await prisma.cartItem.deleteMany();
+    await prisma.contactInquiry.deleteMany();
+    await prisma.testimonial.deleteMany();
+    await prisma.property.deleteMany();
+    await prisma.landPlot.deleteMany();
+    await prisma.pGListing.deleteMany();
+    await prisma.user.deleteMany();
+    console.log("Cleared existing data.");
   }
-
-  // Clean existing data
-  await prisma.cartItem.deleteMany();
-  await prisma.contactInquiry.deleteMany();
-  await prisma.testimonial.deleteMany();
-  await prisma.property.deleteMany();
-  await prisma.landPlot.deleteMany();
-  await prisma.pGListing.deleteMany();
-  await prisma.user.deleteMany();
-
-  console.log("Cleared existing data.");
 
   // Seed Properties
   const properties = await Promise.all([
