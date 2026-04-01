@@ -14,6 +14,7 @@ export const getDashboardStats = async (_req: AuthRequest, res: Response): Promi
     ]);
     res.json({ success: true, data: { users, properties, plots, pgs, inquiries } });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to fetch dashboard stats" });
   }
 };
@@ -27,6 +28,7 @@ export const getUsers = async (_req: AuthRequest, res: Response): Promise<void> 
     });
     res.json({ success: true, data: users });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to fetch users" });
   }
 };
@@ -39,6 +41,7 @@ export const getInquiries = async (_req: AuthRequest, res: Response): Promise<vo
     });
     res.json({ success: true, data: inquiries });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to fetch inquiries" });
   }
 };
@@ -49,6 +52,7 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<v
     const property = await prisma.property.create({ data: req.body });
     res.status(201).json({ success: true, data: property });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to create property" });
   }
 };
@@ -62,6 +66,7 @@ export const updateProperty = async (req: AuthRequest, res: Response): Promise<v
     });
     res.json({ success: true, data: property });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to update property" });
   }
 };
@@ -72,6 +77,7 @@ export const deleteProperty = async (req: AuthRequest, res: Response): Promise<v
     await prisma.property.delete({ where: { id } });
     res.json({ success: true, message: "Property deleted" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to delete property" });
   }
 };
@@ -82,6 +88,7 @@ export const createPlot = async (req: AuthRequest, res: Response): Promise<void>
     const plot = await prisma.landPlot.create({ data: req.body });
     res.status(201).json({ success: true, data: plot });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to create plot" });
   }
 };
@@ -95,6 +102,7 @@ export const updatePlot = async (req: AuthRequest, res: Response): Promise<void>
     });
     res.json({ success: true, data: plot });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to update plot" });
   }
 };
@@ -105,6 +113,7 @@ export const deletePlot = async (req: AuthRequest, res: Response): Promise<void>
     await prisma.landPlot.delete({ where: { id } });
     res.json({ success: true, message: "Plot deleted" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to delete plot" });
   }
 };
@@ -115,6 +124,7 @@ export const createPG = async (req: AuthRequest, res: Response): Promise<void> =
     const pg = await prisma.pGListing.create({ data: req.body });
     res.status(201).json({ success: true, data: pg });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to create PG listing" });
   }
 };
@@ -128,6 +138,7 @@ export const updatePG = async (req: AuthRequest, res: Response): Promise<void> =
     });
     res.json({ success: true, data: pg });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to update PG listing" });
   }
 };
@@ -138,6 +149,7 @@ export const deletePG = async (req: AuthRequest, res: Response): Promise<void> =
     await prisma.pGListing.delete({ where: { id } });
     res.json({ success: true, message: "PG listing deleted" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to delete PG listing" });
   }
 };
@@ -148,6 +160,7 @@ export const getTestimonials = async (_req: AuthRequest, res: Response): Promise
     const testimonials = await prisma.testimonial.findMany({ orderBy: { id: "desc" } });
     res.json({ success: true, data: testimonials });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to fetch testimonials" });
   }
 };
@@ -157,6 +170,7 @@ export const createTestimonial = async (req: AuthRequest, res: Response): Promis
     const testimonial = await prisma.testimonial.create({ data: req.body });
     res.status(201).json({ success: true, data: testimonial });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to create testimonial" });
   }
 };
@@ -170,6 +184,7 @@ export const updateTestimonial = async (req: AuthRequest, res: Response): Promis
     });
     res.json({ success: true, data: testimonial });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to update testimonial" });
   }
 };
@@ -180,6 +195,7 @@ export const deleteTestimonial = async (req: AuthRequest, res: Response): Promis
     await prisma.testimonial.delete({ where: { id } });
     res.json({ success: true, message: "Testimonial deleted" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Failed to delete testimonial" });
   }
 };

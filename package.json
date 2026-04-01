@@ -8,6 +8,7 @@
     "postinstall": "prisma generate --config prisma/prisma.config.ts",
     "build": "prisma generate --config prisma/prisma.config.ts && tsc && npx tsc --esModuleInterop --skipLibCheck --module commonjs --target ES2020 --resolveJsonModule --outDir dist/prisma prisma/seed.ts",
     "start": "node dist/index.js",
+    "start:prod": "prisma migrate deploy --config prisma/prisma.config.ts && node dist/index.js",
     "seed": "node dist/prisma/seed.js",
     "db:migrate": "prisma migrate dev --config prisma/prisma.config.ts",
     "db:seed": "prisma db seed --config prisma/prisma.config.ts",

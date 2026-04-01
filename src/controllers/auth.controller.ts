@@ -38,6 +38,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (error) {
+    console.error("Registration error:", error);
     res.status(500).json({ success: false, message: "Registration failed" });
   }
 };
@@ -68,6 +69,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ success: false, message: "Login failed" });
   }
 };
@@ -86,6 +88,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
 
     res.json({ success: true, data: user });
   } catch (error) {
+    console.error("GetMe error:", error);
     res.status(500).json({ success: false, message: "Failed to get user" });
   }
 };

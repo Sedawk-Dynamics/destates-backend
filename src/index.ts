@@ -30,8 +30,10 @@ if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL environment variabl
 if (isProduction) app.set("trust proxy", 1);
 
 // CORS — allow specific origins in production, all in development
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+// Supports both ALLOWED_ORIGINS and CORS_ORIGIN env vars (Dokploy uses either)
+const originsEnv = process.env.ALLOWED_ORIGINS || process.env.CORS_ORIGIN || "";
+const allowedOrigins = originsEnv
+  ? originsEnv.split(",").map((o) => o.trim()).filter(Boolean)
   : ["http://localhost:3000"];
 
 app.use(cors({
