@@ -11,10 +11,12 @@ import authRoutes from "./routes/auth.routes";
 import propertyRoutes from "./routes/property.routes";
 import plotRoutes from "./routes/plot.routes";
 import pgRoutes from "./routes/pg.routes";
-import cartRoutes from "./routes/cart.routes";
+import investmentRoutes from "./routes/investment.routes";
 import contactRoutes from "./routes/contact.routes";
 import testimonialRoutes from "./routes/testimonial.routes";
+import insuranceRoutes from "./routes/insurance.routes";
 import adminRoutes from "./routes/admin.routes";
+import notificationRoutes from "./routes/notification.routes";
 import uploadRoutes from "./routes/upload.routes";
 import prisma from "./utils/prisma";
 
@@ -25,6 +27,8 @@ const isProduction = process.env.NODE_ENV === "production";
 // Validate required env vars
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET environment variable is required");
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL environment variable is required");
+if (!process.env.RAZORPAY_KEY_ID) throw new Error("RAZORPAY_KEY_ID environment variable is required");
+if (!process.env.RAZORPAY_KEY_SECRET) throw new Error("RAZORPAY_KEY_SECRET environment variable is required");
 
 // Trust proxy (needed behind reverse proxy / load balancer)
 if (isProduction) app.set("trust proxy", 1);
@@ -79,10 +83,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/plots", plotRoutes);
 app.use("/api/pgs", pgRoutes);
-app.use("/api/cart", cartRoutes);
+app.use("/api/investments", investmentRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/testimonials", testimonialRoutes);
+app.use("/api/insurance", insuranceRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/upload", uploadRoutes);
 
 // Health check — verifies database connectivity

@@ -7,10 +7,13 @@ import {
   getDashboardStats,
   getUsers,
   getInquiries,
-  createProperty, updateProperty, deleteProperty,
+  getInvestments,
+  fractionSplit,
+  createProperty, updateProperty, deleteProperty, togglePropertyDisabled,
   createPlot, updatePlot, deletePlot,
   createPG, updatePG, deletePG,
   getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial,
+  getAllInsurancePlans, getInsurancePlans, createInsurancePlan, updateInsurancePlan, deleteInsurancePlan, connectInsurancePlan, disconnectInsurancePlan,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -27,6 +30,9 @@ router.get("/users", getUsers);
 // Inquiries (read-only)
 router.get("/inquiries", getInquiries);
 
+// Investments (read-only)
+router.get("/investments", getInvestments);
+
 // Properties CRUD
 const positiveNumber = (field: string, msg: string) =>
   body(field).custom((v) => { if (typeof v !== "number" || v <= 0) throw new Error(msg); return true; });
@@ -40,13 +46,16 @@ const propertyValidation = [
   positiveNumber("price", "Price must be positive"),
   positiveNumber("expectedROI", "Expected ROI is required"),
   body("area").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) throw new Error("Area must be positive"); return true; }),
-  body("units").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) throw new Error("Units must be positive"); return true; }),
-  nonNegativeInt("availableUnits", "Available units required"),
+  body("totalFractions").custom((v) => { if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) throw new Error("Total fractions must be positive"); return true; }),
+  nonNegativeInt("availableFractions", "Available fractions required"),
+  positiveNumber("pricePerFraction", "Price per fraction must be positive"),
   body("description").trim().notEmpty().withMessage("Description is required"),
 ];
 
 router.post("/properties", propertyValidation, validate, createProperty);
 router.put("/properties/:id", updateProperty);
+router.put("/properties/:id/fraction-split", fractionSplit);
+router.put("/properties/:id/toggle-disabled", togglePropertyDisabled);
 router.delete("/properties/:id", deleteProperty);
 
 // Plots CRUD
@@ -92,5 +101,14 @@ router.get("/testimonials", getTestimonials);
 router.post("/testimonials", testimonialValidation, validate, createTestimonial);
 router.put("/testimonials/:id", updateTestimonial);
 router.delete("/testimonials/:id", deleteTestimonial);
+
+// Insurance Plans CRUD
+router.get("/insurance-plans", getAllInsurancePlans);
+router.get("/insurance-plans/:propertyId", getInsurancePlans);
+router.post("/insurance-plans", createInsurancePlan);
+router.put("/insurance-plans/:id", updateInsurancePlan);
+router.delete("/insurance-plans/:id", deleteInsurancePlan);
+router.post("/insurance-plans/connect", connectInsurancePlan);
+router.post("/insurance-plans/disconnect", disconnectInsurancePlan);
 
 export default router;

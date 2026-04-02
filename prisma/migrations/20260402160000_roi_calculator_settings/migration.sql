@@ -1,0 +1,6 @@
+-- AlterTable - Add ROI calculator fields
+ALTER TABLE "Property" ADD COLUMN "capitalAppreciation" DOUBLE PRECISION NOT NULL DEFAULT 5;
+ALTER TABLE "Property" ADD COLUMN "rentalYieldMonths" INTEGER NOT NULL DEFAULT 12;
+ALTER TABLE "Property" ADD COLUMN "lockInPeriod" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "Property" ADD COLUMN "minFractions" INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE "Property" ADD COLUMN "maxFractions" INTEGER;
