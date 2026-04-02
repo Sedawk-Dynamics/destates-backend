@@ -9,10 +9,10 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
-// Create Razorpay order for fractional investment
+// Create Razorpay order for fractional investment (with optional insurance)
 export const createOrder = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { propertyId, fractions } = req.body;
+    const { propertyId, fractions, insurancePlanId } = req.body;
     const fractionsCount = Number(fractions);
 
     if (!propertyId || !fractionsCount || fractionsCount < 1 || !Number.isInteger(fractionsCount)) {
@@ -54,8 +54,26 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    const amount = fractionsCount * property.pricePerFraction;
-    const amountInPaise = Math.round(amount * 100);
+    // Validate insurance plan if selected
+    let insurancePremium = 0;
+    if (insurancePlanId) {
+      const plan = await prisma.insurancePlan.findFirst({
+        where: {
+          id: insurancePlanId,
+          active: true,
+          properties: { some: { id: propertyId } },
+        },
+      });
+      if (!plan) {
+        res.status(400).json({ success: false, message: "Invalid insurance plan for this property" });
+        return;
+      }
+      insurancePremium = plan.monthlyPremium;
+    }
+
+    const investmentAmount = fractionsCount * property.pricePerFraction;
+    const totalAmount = investmentAmount + insurancePremium;
+    const amountInPaise = Math.round(totalAmount * 100);
 
     const order = await razorpay.orders.create({
       amount: amountInPaise,
@@ -65,6 +83,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
         propertyId,
         userId: req.user!.id,
         fractions: String(fractionsCount),
+        insurancePlanId: insurancePlanId || "",
       },
     });
 
@@ -74,7 +93,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
         userId: req.user!.id,
         propertyId,
         fractions: fractionsCount,
-        amountPaid: amount,
+        amountPaid: investmentAmount,
         pricePerFraction: property.pricePerFraction,
         status: "PENDING",
         razorpayOrderId: order.id,
@@ -88,6 +107,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
         amount: amountInPaise,
         currency: "INR",
         investmentId: investment.id,
+        insurancePremium,
         key: process.env.RAZORPAY_KEY_ID,
       },
     });
@@ -97,10 +117,10 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// Verify Razorpay payment and finalize investment
+// Verify Razorpay payment and finalize investment (+ insurance if selected)
 export const verifyPayment = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, insurancePlanId } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       res.status(400).json({ success: false, message: "Missing payment verification fields" });
@@ -119,7 +139,6 @@ export const verifyPayment = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    // Find the pending investment
     const investment = await prisma.investment.findUnique({
       where: { razorpayOrderId: razorpay_order_id },
     });
@@ -134,7 +153,6 @@ export const verifyPayment = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    // Use interactive transaction to ensure atomicity
     const updatedInvestment = await prisma.$transaction(async (tx) => {
       // 1. Mark investment as completed
       const inv = await tx.investment.update({
@@ -168,6 +186,25 @@ export const verifyPayment = async (req: AuthRequest, res: Response): Promise<vo
           where: { id: property.id },
           data: { status: newStatus },
         });
+      }
+
+      // 4. Auto-activate insurance if plan was selected
+      if (insurancePlanId) {
+        const plan = await tx.insurancePlan.findUnique({ where: { id: insurancePlanId } });
+        if (plan) {
+          await tx.userInsurance.create({
+            data: {
+              userId: investment.userId,
+              investmentId: investment.id,
+              insurancePlanId: plan.id,
+              amountPaid: plan.monthlyPremium,
+              status: "ACTIVE",
+              razorpayOrderId: `${razorpay_order_id}_ins`,
+              razorpayPaymentId: razorpay_payment_id,
+              razorpaySignature: razorpay_signature,
+            },
+          });
+        }
       }
 
       return inv;
